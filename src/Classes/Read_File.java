@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Classes;
 
 import java.io.BufferedReader;
@@ -96,6 +93,13 @@ public class Read_File {
         } catch (Exception e) {
             System.out.println("File not found");
         }
+        
+        // Debugging output to verify the methods detected
+        System.out.println("Detected Methods:");
+        for (String method : auxList) {
+            System.out.println(method);
+        }
+        
         for (int i = 0; i < ps.size(); i += 2) {
             worstCase.add(methods(ps.get(i)) - complexity(path, ps.get(i)));
         }
