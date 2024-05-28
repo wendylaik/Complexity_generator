@@ -12,18 +12,21 @@ public class Node {
     public int complexity;
     public int termi_N;
     public Node next;
+    public String content;
 
     /**
      *
      * @param elem
      * @param comp
      * @param term
+     * @param cont
      */
-    public Node(String elem, int comp, int term) {
-        termi_N = term;
-        complexity = comp;
-        data = elem;
-        next = this;
+    public Node(String elem, String cont, int comp, int term) {
+        this.data = elem;
+        this.complexity = comp;
+        this.termi_N = term;
+        this.next = this;
+        this.content = cont;
     }
 
     /**
@@ -88,6 +91,22 @@ public class Node {
      */
     public void setNext(Node next) {
         this.next = next;
+    }
+    
+    /**
+     * 
+     * @return content
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * 
+     * @param content 
+     */
+    public void setContent(String content) {
+        this.content = content;
     }
 
 }

@@ -4,6 +4,7 @@ package Classes;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  *
@@ -94,19 +95,30 @@ public class Read_File {
             System.out.println("File not found");
         }
         
-        // Debugging output to verify the methods detected
-        System.out.println("Detected Methods:");
-        for (String method : auxList) {
-            System.out.println(method);
-        }
-        
         for (int i = 0; i < ps.size(); i += 2) {
             worstCase.add(methods(ps.get(i)) - complexity(path, ps.get(i)));
         }
         for (int i = 0; i < auxList.size(); i++) {
-            lines.insert(auxList.get(i), worstCase.get(i), complexity(path, ps.get(i)));
+            String methodContent = getMethodContent(ps.get(i));
+            lines.insert(auxList.get(i), methodContent, worstCase.get(i), complexity(path, ps.get(i)));
         }
-        lines.show();
+        
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Detected Methods:");
+            lines.show();
+            System.out.print("Select a method to view (or type 0 to exit): ");
+            int selection = scanner.nextInt();
+            if (selection == 0) break;
+            Node selectedNode = lines.getNode(selection);
+            if (selectedNode != null) {
+                System.out.println("Method Content:\n" + selectedNode.content);
+                System.out.println("Complexity: OE" + selectedNode.complexity + " + N" + selectedNode.termi_N);
+            } else {
+                System.out.println("Invalid selection. Please try again.");
+            }
+        }
+        scanner.close();
     }
 
     /**
@@ -212,6 +224,17 @@ public class Read_File {
         StackClass p = new StackClass();
         OE = p.balance(chain);
         return OE;
+    }
+    
+    public String getMethodContent(int startLine) {
+        StringBuilder content = new StringBuilder();
+        for (int i = startLine; i < list.size(); i++) {
+            content.append(list.get(i)).append("\n");
+            if (list.get(i).contains("}")) {
+                break;
+            }
+        }
+        return content.toString();
     }
 
     /**
