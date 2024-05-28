@@ -1,10 +1,10 @@
-
 package Classes;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Stack;
 
 /**
  *
@@ -12,9 +12,10 @@ import java.util.Scanner;
  * @author francini Vindas
  */
 public class Read_File {
-   private String[] variables = new String[15];
+
+    private String[] variables = new String[15];
     private String[] symbols = new String[17];
-    private String[] factors = new String[4];
+    private String[] factors = new String[5];
     int counter = 0;
     ArrayList<String> auxList = new ArrayList();
     ArrayList<String> list = new ArrayList();
@@ -84,17 +85,16 @@ public class Read_File {
             String temp = "";
             while ((bfRead = bf.readLine()) != null) {
                 counter++;
-                temp = temp + bfRead;
                 if (!detectName(temp, counter).equals("")) {
                     auxList.add(detectName(temp, counter));
                 }
-                list.add(temp.trim());
-                temp = "";
+                list.add(bfRead.trim());  // Agregamos cada línea directamente a la lista
+                temp = bfRead; // Actualizamos temp con la última línea leída
             }
         } catch (Exception e) {
             System.out.println("File not found");
         }
-        
+
         for (int i = 0; i < ps.size(); i += 2) {
             worstCase.add(methods(ps.get(i)) - complexity(path, ps.get(i)));
         }
@@ -102,18 +102,21 @@ public class Read_File {
             String methodContent = getMethodContent(ps.get(i));
             lines.insert(auxList.get(i), methodContent, worstCase.get(i), complexity(path, ps.get(i)));
         }
-        
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Detected Methods:");
             lines.show();
             System.out.print("Select a method to view (or type 0 to exit): ");
             int selection = scanner.nextInt();
-            if (selection == 0) break;
+            if (selection == 0) {
+                break;
+            }
             Node selectedNode = lines.getNode(selection);
             if (selectedNode != null) {
                 System.out.println("Method Content:\n" + selectedNode.content);
-                System.out.println("Complexity: OE" + selectedNode.complexity + " + N" + selectedNode.termi_N);
+                System.out.println("Complexity: OE" + selectedNode.complexity
+                        + " + N" + selectedNode.termi_N);
             } else {
                 System.out.println("Invalid selection. Please try again.");
             }
@@ -136,14 +139,16 @@ public class Read_File {
         String aux = "";
         for (int i = 0; i < split.length; i++) {
             if (split[i].contains("(")) {
-                break;
-            }
-            for (int j = 0; j < 15; j++) {
-                if (split[i].equals(library(j))) {
-                    method = split[i + 1];
-                    break;
+                for (int j = 0; j < 15; j++) {
+                    if (split[i - 1].equals(library(j)) || split[i - 1].contains("List")) {
+                        method = split[i];
+                        break;
+                    } else if (!split[i].contains(library(j)) && containsAccessModifier(split, i)) {
+                        method = split[i];
+                    }
                 }
             }
+
         }
         if (method.contains("(")) {
             if (method.contains("get") || method.contains("set")) {
@@ -162,6 +167,14 @@ public class Read_File {
             aux = "";
         }
         return aux;
+    }
+
+    private boolean containsAccessModifier(String[] split, int index) {
+        // Verifica si la palabra dos o tres espacios atrás es un modificador de acceso
+        if (index >= 3 && (split[index - 2].equals("public") || split[index - 2].equals("private") || split[index - 2].equals("protected"))) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -225,15 +238,36 @@ public class Read_File {
         OE = p.balance(chain);
         return OE;
     }
-    
+
     public String getMethodContent(int startLine) {
         StringBuilder content = new StringBuilder();
-        for (int i = startLine; i < list.size(); i++) {
-            content.append(list.get(i)).append("\n");
-            if (list.get(i).contains("}")) {
-                break;
+        boolean methodStarted = false;
+        Stack<Character> braceStack = new Stack<>();
+
+        // Añadimos la primera línea del método
+        content.append(list.get(startLine)).append("\n");
+
+        for (int i = startLine + 1; i < list.size(); i++) {
+            String line = list.get(i);
+            if (line.contains("{")) {
+                if (!methodStarted) {
+                    methodStarted = true;
+                }
+                braceStack.push('{');
+            }
+            if (methodStarted) {
+                content.append(line).append("\n");
+            }
+            if (line.contains("}")) {
+                if (!braceStack.isEmpty()) {
+                    braceStack.pop();
+                }
+                if (braceStack.isEmpty()) {
+                    break;  // Break the loop when all open braces are closed
+                }
             }
         }
+
         return content.toString();
     }
 
@@ -275,7 +309,8 @@ public class Read_File {
         this.factors[1] = "while";
         this.factors[2] = "switch";
         this.factors[3] = "if";
+        this.factors[4] = "do";
 
         return factors[i];
-    } 
+    }
 }
