@@ -21,6 +21,6 @@ public class ComplexityMain {
      */
     public static void main(String[] args) {
         Read_File re = new Read_File();
-        re.read("Example.java");
+        re.read("ejemplo.java");
     }
 }

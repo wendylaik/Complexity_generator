@@ -64,7 +64,7 @@ public class CircularList {
         Node aux = last.next;
         int index = 1;
         do {
-            System.out.println(index + ": " + aux.data + "  OE" + aux.complexity + " + N" + aux.termi_N);
+            System.out.println(index + ": " + aux.data );
             aux = aux.next;
             index++;
         } while (aux != last.next);
