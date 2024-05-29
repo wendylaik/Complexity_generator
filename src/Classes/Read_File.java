@@ -78,29 +78,31 @@ public class Read_File {
      */
     public void read(String path) {
         CircularList lines = new CircularList();
-        ArrayList<Integer> worstCase = new ArrayList();
+        ArrayList<Integer> worstCase = new ArrayList<>();
         try {
             BufferedReader bf = new BufferedReader(new FileReader(path));
             String bfRead;
-            String temp = "";
             while ((bfRead = bf.readLine()) != null) {
                 counter++;
-                if (!detectName(temp, counter).equals("")) {
-                    auxList.add(detectName(temp, counter));
+                String methodName = detectName(bfRead, counter);
+                if (!methodName.isEmpty()) {
+                    auxList.add(methodName);
+                    System.out.println("Detected method: " + methodName + " at line " + counter); // Debug
                 }
-                list.add(bfRead.trim());  // Agregamos cada línea directamente a la lista
-                temp = bfRead; // Actualizamos temp con la última línea leída
+                list.add(bfRead.trim());
             }
         } catch (Exception e) {
             System.out.println("File not found");
         }
 
-        for (int i = 0; i < ps.size(); i += 2) {
-            worstCase.add(methods(ps.get(i)) - complexity(path, ps.get(i)));
-        }
-        for (int i = 0; i < auxList.size(); i++) {
-            String methodContent = getMethodContent(ps.get(i));
-            lines.insert(auxList.get(i), methodContent, worstCase.get(i), complexity(path, ps.get(i)));
+        System.out.println("Lines where methods start: " + ps); // Debug
+
+        for (int i = 0; i < ps.size(); i++) {
+            int methodStartLine = ps.get(i);
+            int methodComplexity = complexity(path, methodStartLine);
+            String methodContent = getMethodContent(methodStartLine);
+            int methodOE = methods(methodStartLine);
+            lines.insert(auxList.get(i), methodContent, methodOE, methodComplexity);
         }
 
         Scanner scanner = new Scanner(System.in);
@@ -115,8 +117,7 @@ public class Read_File {
             Node selectedNode = lines.getNode(selection);
             if (selectedNode != null) {
                 System.out.println("Method Content:\n" + selectedNode.content);
-                System.out.println("Complexity: OE" + selectedNode.complexity
-                        + " + N" + selectedNode.termi_N);
+                System.out.println("Complexity: OE" + selectedNode.complexity + " + N" + selectedNode.termi_N);
             } else {
                 System.out.println("Invalid selection. Please try again.");
             }
@@ -134,26 +135,33 @@ public class Read_File {
      * @return aux
      */
     public String detectName(String data, int line) {
-        String[] split = data.split(" ");
+        String[] split = data.split("\\s+");
         String method = "";
         String aux = "";
+
         for (int i = 0; i < split.length; i++) {
             if (split[i].contains("(")) {
+                boolean isMethod = false;
                 for (int j = 0; j < 15; j++) {
-                    if (split[i - 1].equals(library(j)) || split[i - 1].contains("List")) {
-                        method = split[i];
+                    if (i > 0 && (split[i - 1].equals(library(j)) || split[i - 1].contains("List"))) {
+                        isMethod = true;
                         break;
-                    } else if (!split[i].contains(library(j)) && containsAccessModifier(split, i)) {
-                        method = split[i];
                     }
                 }
-            }
 
+                if (!isMethod && i > 1 && containsAccessModifier(split, i)) {
+                    isMethod = true;
+                }
+
+                if (isMethod) {
+                    method = split[i];
+                    break;
+                }
+            }
         }
+
         if (method.contains("(")) {
-            if (method.contains("get") || method.contains("set")) {
-                aux = "";
-            } else {
+            if (!method.contains("get") && !method.contains("set")) {
                 for (int i = 0; i < method.length(); i++) {
                     if (method.charAt(i) != '(') {
                         aux = aux + method.charAt(i);
@@ -166,6 +174,7 @@ public class Read_File {
         } else {
             aux = "";
         }
+
         return aux;
     }
 
@@ -239,37 +248,32 @@ public class Read_File {
         return OE;
     }
 
-    public String getMethodContent(int startLine) {
-        StringBuilder content = new StringBuilder();
-        boolean methodStarted = false;
-        Stack<Character> braceStack = new Stack<>();
+public String getMethodContent(int startLine) {
+    StringBuilder content = new StringBuilder();
+    boolean methodStarted = false;
+    int braceCount = 0;
 
-        // Añadimos la primera línea del método
-        content.append(list.get(startLine)).append("\n");
-
-        for (int i = startLine + 1; i < list.size(); i++) {
-            String line = list.get(i);
-            if (line.contains("{")) {
-                if (!methodStarted) {
-                    methodStarted = true;
-                }
-                braceStack.push('{');
+    for (int i = startLine - 1; i < list.size(); i++) {
+        String line = list.get(i);
+        if (line.contains("{")) {
+            if (!methodStarted) {
+                methodStarted = true;
             }
-            if (methodStarted) {
-                content.append(line).append("\n");
-            }
-            if (line.contains("}")) {
-                if (!braceStack.isEmpty()) {
-                    braceStack.pop();
-                }
-                if (braceStack.isEmpty()) {
-                    break;  // Break the loop when all open braces are closed
-                }
+            braceCount++;
+        }
+        if (methodStarted) {
+            content.append(line).append("\n");
+        }
+        if (line.contains("}")) {
+            braceCount--;
+            if (braceCount == 0) {
+                break;  // Break the loop when all open braces are closed
             }
         }
-
-        return content.toString();
     }
+
+    return content.toString();
+}
 
     /**
      *

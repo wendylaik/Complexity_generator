@@ -1,6 +1,8 @@
 package Classes;
 
-/**Hosts all processes related to the node
+/**
+ * Hosts all processes related to the node
+ *
  * @author wendy Parra
  * @author francini Vindas
  */
@@ -26,12 +28,15 @@ public class CircularList {
     /**
      * Method to insert nodes
      *
-     * @param element
+     * @param name
      * @param complexity
      * @param tn
+     * @param content
      * @return this
      */
-    public CircularList insert(String name, String content, int complexity, int tn) {
+    
+    public CircularList insert(String name, String content, int complexity
+            , int tn) {
         Node newNode = new Node(name, content, complexity, tn);
         if (last != null) {
             newNode.next = last.next;
@@ -44,21 +49,30 @@ public class CircularList {
     /**
      * Method to print the circular list
      */
-public void show() {
-    if (last == null) return;
-    Node aux = last.next;
-    int index = 1;
-    do {
-        System.out.println(index + ": " + aux.data + "  OE" + aux.complexity 
-                + " + N" + aux.termi_N);
-        aux = aux.next;
-        index++;
-    } while (aux != last.next);
-}
+    public void show() {
+        if (last == null) {
+            return;
+        }
+        Node aux = last.next;
+        int index = 1;
+        do {
+            System.out.println(index + ": " + aux.data + "  OE" + aux.complexity
+                    + " + N" + aux.termi_N);
+            aux = aux.next;
+            index++;
+        } while (aux != last.next);
+    }
 
-    
-        public Node getNode(int index) {
-        if (last == null) return null;
+    /**
+     * Method to get a node by index
+     *
+     * @param index
+     * @return the node at the given index or null if not found
+     */
+    public Node getNode(int index) {
+        if (last == null) {
+            return null;
+        }
         Node aux = last.next;
         int currentIndex = 1;
         do {
