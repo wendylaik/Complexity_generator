@@ -7,6 +7,11 @@ import java.util.Scanner;
 import java.util.Stack;
 
 /**
+ * This class provides methods to read and analyze a .java file. It detects
+ * method names, calculates the complexity of methods and loops, and stores
+ * information in a circular list.
+ *
+ *
  *
  * @author wendy Parra
  * @author francini Vindas
@@ -17,64 +22,69 @@ public class Read_File {
     private String[] symbols = new String[17];
     private String[] factors = new String[5];
     int counter = 0;
-    ArrayList<String> auxList = new ArrayList();
-    ArrayList<String> list = new ArrayList();
-    ArrayList<Integer> ps = new ArrayList();
+    ArrayList<String> auxList = new ArrayList<>();
+    ArrayList<String> list = new ArrayList<>();
+    ArrayList<Integer> ps = new ArrayList<>();
 
     /**
+     * Returns the list of lines read from the file.
      *
-     * @return list
+     * @return The list of lines.
      */
     public ArrayList<String> getList() {
         return list;
     }
 
     /**
+     * Sets the list of lines read from the file.
      *
-     * @param list
+     * @param list The list of lines.
      */
     public void setList(ArrayList<String> list) {
         this.list = list;
     }
 
     /**
+     * Returns the current line counter.
      *
-     * @return counter
+     * @return The line counter.
      */
     public int getCounter() {
         return counter;
     }
 
     /**
+     * Sets the current line counter.
      *
-     * @param counter
+     * @param counter The line counter.
      */
     public void setCounter(int counter) {
         this.counter = counter;
     }
 
     /**
+     * Returns the array of detected variables.
      *
-     * @return variables
+     * @return The array of variables.
      */
     public String[] getVariables() {
         return variables;
     }
 
     /**
+     * Sets the array of detected variables.
      *
-     * @param variables
+     * @param variables The array of variables.
      */
     public void setVariables(String[] variables) {
         this.variables = variables;
     }
 
     /**
-     * Receives as a parameter the path of the .java file to be analyzed.
-     * Additionally, methods are implemented to capture the name, complexity,
-     * and store it in the circular list.
+     * Reads a .java file from the specified path, detects method names and
+     * their complexity, and stores the information in a circular list.
      *
-     * @param path
+     * @param path The path of the .java file to be analyzed.
      */
     public void read(String path) {
         CircularList lines = new CircularList();
@@ -87,16 +97,12 @@ public class Read_File {
                 String methodName = detectName(bfRead, counter);
                 if (!methodName.isEmpty()) {
                     auxList.add(methodName);
-//                    System.out.println("Detected method: " + methodName + 
-//                            " at line " + counter); // Debug
                 }
                 list.add(bfRead.trim());
             }
         } catch (Exception e) {
             System.out.println("File not found");
         }
-
-       // System.out.println("Lines where methods start: " + ps); // Debug
 
         for (int i = 0; i < ps.size(); i++) {
             int methodStartLine = ps.get(i);
@@ -105,7 +111,7 @@ public class Read_File {
             int methodOE = methods(methodStartLine);
             lines.insert(auxList.get(i), methodContent, methodOE, methodComplexity);
         }
-        
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Detected Methods:");
@@ -118,8 +124,8 @@ public class Read_File {
             Node selectedNode = lines.getNode(selection);
             if (selectedNode != null) {
                 System.out.println("Method Content:\n" + selectedNode.content);
-                System.out.println("Complexity: OE" + selectedNode.complexity +
-                        " + " + selectedNode.termi_N + "N");
+                System.out.println("Complexity: OE" + selectedNode.complexity
+                        + " + " + selectedNode.termi_N + "N");
             } else {
                 System.out.println("Invalid selection. Please try again.");
             }
@@ -128,13 +134,11 @@ public class Read_File {
     }
 
     /**
+     * Detects the name of a method in a given line of code.
      *
-     * Receives as a parameter the lines of the file and also the line number
-     * where it is located, and returns the names of the methods in the file.
-     *
-     * @param data
-     * @param line
-     * @return aux
+     * @param data The line of code to analyze.
+     * @param line The line number of the code.
+     * @return The name of the method if detected, otherwise an empty string.
      */
     public String detectName(String data, int line) {
         String[] split = data.split("\\s+");
@@ -145,8 +149,8 @@ public class Read_File {
             if (split[i].contains("(")) {
                 boolean isMethod = false;
                 for (int j = 0; j < 15; j++) {
-                    if (i > 0 && (split[i - 1].equals(library(j)) || split[i - 
-                            1].contains("List"))) {
+                    if (i > 0 && (split[i - 1].equals(library(j)) || split[i
+                            - 1].contains("List"))) {
                         isMethod = true;
                         break;
                     }
@@ -181,22 +185,28 @@ public class Read_File {
         return aux;
     }
 
+    /**
+     * Checks if the given array of strings contains an access modifier at the
+     * specified index.
+     *
+     * @param split The array of strings to check.
+     * @param index The index to check for an access modifier.
+     * @return True if an access modifier is found, otherwise false.
+     */
     private boolean containsAccessModifier(String[] split, int index) {
-        // Verifica si la palabra dos o tres espacios atrás es un modificador de acceso
-        if (index >= 3 && (split[index - 2].equals("public") || split[index - 
-                2].equals("private") || split[index - 2].equals("protected"))) {
+        if (index >= 3 && (split[index - 2].equals("public") || split[index
+                - 2].equals("private") || split[index - 2].equals("protected"))) {
             return true;
         }
         return false;
     }
 
     /**
-     * This method specializes in determining the algorithmic complexity of
-     * loops in order to determine the algorithmic cost.
+     * Determines the algorithmic complexity of loops in the specified method.
      *
-     * @param path
-     * @param d
-     * @return comp
+     * @param path The path of the .java file.
+     * @param d The line number where the method starts.
+     * @return The algorithmic complexity of the method.
      */
     public int complexity(String path, int d) {
         int limit = 0;
@@ -214,8 +224,8 @@ public class Read_File {
                 for (int h = 0; h < 4; h++) {
                     if (list.get(i).contains(loopLibrary(h)) && list.get(i).
                             contains("(")) {
-                        comp = p.totalBalance(true, i, path);
-                        endLoop = p.balancePosition(i, path) + 1;
+                        comp = p.calculateTotalBalance(true, i, path);
+                        endLoop = p.findBalancePosition(i, path) + 1;
                         i = endLoop;
                     }
                 }
@@ -225,12 +235,11 @@ public class Read_File {
     }
 
     /**
+     * Determines the overall complexity of the entire method, not just the
+     * loops.
      *
-     * Unlike the complexity method, this method determines the complexity of
-     * the entire method, not just the loops.
-     *
-     * @param k
-     * @return OE
+     * @param k The line number where the method starts.
+     * @return The overall complexity of the method.
      */
     public int methods(int k) {
         String chain = "";
@@ -250,43 +259,49 @@ public class Read_File {
             }
         }
         StackClass p = new StackClass();
-        OE = p.balance(chain);
+        OE = p.calculateSymbolBalance(chain);
         return OE;
     }
 
-public String getMethodContent(int startLine) {
-    StringBuilder content = new StringBuilder();
-    boolean methodStarted = false;
-    int braceCount = 0;
+    /**
+     * Retrieves the content of a method starting from the specified line
+     * number.
+     *
+     * @param startLine The line number where the method starts.
+     * @return The content of the method.
+     */
+    public String getMethodContent(int startLine) {
+        StringBuilder content = new StringBuilder();
+        boolean methodStarted = false;
+        int braceCount = 0;
 
-    for (int i = startLine - 1; i < list.size(); i++) {
-        String line = list.get(i);
-        if (line.contains("{")) {
-            if (!methodStarted) {
-                methodStarted = true;
+        for (int i = startLine - 1; i < list.size(); i++) {
+            String line = list.get(i);
+            if (line.contains("{")) {
+                if (!methodStarted) {
+                    methodStarted = true;
+                }
+                braceCount++;
             }
-            braceCount++;
-        }
-        if (methodStarted) {
-            content.append(line).append("\n");
-        }
-        if (line.contains("}")) {
-            braceCount--;
-            if (braceCount == 0) {
-                break;  // Break the loop when all open braces are closed
+            if (methodStarted) {
+                content.append(line).append("\n");
+            }
+            if (line.contains("}")) {
+                braceCount--;
+                if (braceCount == 0) {
+                    break;
+                }
             }
         }
+
+        return content.toString();
     }
 
-    return content.toString();
-}
-
     /**
+     * Provides a library of common Java keywords used to detect methods.
      *
-     * The library contains all the parameters to detect a method.
-     *
-     * @param i
-     * @return variables
+     * @param i The index of the keyword in the library.
+     * @return The keyword at the specified index.
      */
     public String library(int i) {
         this.variables[0] = "public";
@@ -309,10 +324,10 @@ public String getMethodContent(int startLine) {
     }
 
     /**
-     * This library detects the loops that are in a line to analyze them.
+     * Provides a library of common Java keywords used to detect loops.
      *
-     * @param i
-     * @return factors
+     * @param i The index of the keyword in the library.
+     * @return The keyword at the specified index.
      */
     public String loopLibrary(int i) {
         this.factors[0] = "for";
