@@ -7,8 +7,8 @@ import Classes.Read_File;
  * The main class to run the application. It reads a Java file and analyzes the
  * complexity of methods within it.
  *
- * @autor wendy Parra
- * @autor francini Vindas
+ * @author wendy Parra
+ * @author francini Vindas
  */
 public class ComplexityMain {
 

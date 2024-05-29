@@ -7,8 +7,8 @@ package Classes;
  *
  * @see Node
  *
- * @autor wendy Parra
- * @autor francini Vindas
+ * @author wendy Parra
+ * @author francini Vindas
  */
 public class CircularList {
 

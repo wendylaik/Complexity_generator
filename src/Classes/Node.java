@@ -8,8 +8,8 @@ package Classes;
  * @see java.lang.String
  * @see java.lang.Integer
  *
- * @autor wendy Parra
- * @autor francini Vindas
+ * @author wendy Parra
+ * @author francini Vindas
  */
 public class Node {
 
