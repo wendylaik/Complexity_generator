@@ -87,7 +87,8 @@ public class Read_File {
                 String methodName = detectName(bfRead, counter);
                 if (!methodName.isEmpty()) {
                     auxList.add(methodName);
-                    System.out.println("Detected method: " + methodName + " at line " + counter); // Debug
+//                    System.out.println("Detected method: " + methodName + 
+//                            " at line " + counter); // Debug
                 }
                 list.add(bfRead.trim());
             }
@@ -95,7 +96,7 @@ public class Read_File {
             System.out.println("File not found");
         }
 
-        System.out.println("Lines where methods start: " + ps); // Debug
+       // System.out.println("Lines where methods start: " + ps); // Debug
 
         for (int i = 0; i < ps.size(); i++) {
             int methodStartLine = ps.get(i);
@@ -104,7 +105,7 @@ public class Read_File {
             int methodOE = methods(methodStartLine);
             lines.insert(auxList.get(i), methodContent, methodOE, methodComplexity);
         }
-
+        
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Detected Methods:");
@@ -117,7 +118,8 @@ public class Read_File {
             Node selectedNode = lines.getNode(selection);
             if (selectedNode != null) {
                 System.out.println("Method Content:\n" + selectedNode.content);
-                System.out.println("Complexity: OE" + selectedNode.complexity + " + N" + selectedNode.termi_N);
+                System.out.println("Complexity: OE" + selectedNode.complexity +
+                        " + " + selectedNode.termi_N + "N");
             } else {
                 System.out.println("Invalid selection. Please try again.");
             }
@@ -143,7 +145,8 @@ public class Read_File {
             if (split[i].contains("(")) {
                 boolean isMethod = false;
                 for (int j = 0; j < 15; j++) {
-                    if (i > 0 && (split[i - 1].equals(library(j)) || split[i - 1].contains("List"))) {
+                    if (i > 0 && (split[i - 1].equals(library(j)) || split[i - 
+                            1].contains("List"))) {
                         isMethod = true;
                         break;
                     }
@@ -180,7 +183,8 @@ public class Read_File {
 
     private boolean containsAccessModifier(String[] split, int index) {
         // Verifica si la palabra dos o tres espacios atrás es un modificador de acceso
-        if (index >= 3 && (split[index - 2].equals("public") || split[index - 2].equals("private") || split[index - 2].equals("protected"))) {
+        if (index >= 3 && (split[index - 2].equals("public") || split[index - 
+                2].equals("private") || split[index - 2].equals("protected"))) {
             return true;
         }
         return false;
@@ -208,7 +212,8 @@ public class Read_File {
             }
             if (i != limit) {
                 for (int h = 0; h < 4; h++) {
-                    if (list.get(i).contains(loopLibrary(h)) && list.get(i).contains("(")) {
+                    if (list.get(i).contains(loopLibrary(h)) && list.get(i).
+                            contains("(")) {
                         comp = p.totalBalance(true, i, path);
                         endLoop = p.balancePosition(i, path) + 1;
                         i = endLoop;
@@ -234,7 +239,8 @@ public class Read_File {
         int OE = 0;
         for (int i = k; i < list.size(); i++) {
             for (int j = 0; j < 4; j++) {
-                if (list.get(i).contains(library(j)) && list.get(i).contains("(")) {
+                if (list.get(i).contains(library(j)) && list.get(i)
+                        .contains("(")) {
                     i = list.size() - 1;
                     limit = i;
                 }

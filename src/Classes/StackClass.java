@@ -43,12 +43,43 @@ public class StackClass {
         int sum = 0;
         char[] array = str.toCharArray();
         for (char c : array) {
-            if (c == '=' || c == '+' || c == '-' || c == '<' || c == '>' || c == '*' || c == '/' || c == '%') {
+            if (c == '=' || c == '+' || c == '-' || c == '<' || c == '>' ||
+                    c == '*' || c == '/' || c == '%') {
                 data.push(c);
                 sum++;
             }
+        }        
+   
+    boolean insideComment = false;
+    boolean insideString = false;
+    for (int i = 0; i < array.length; i++) {
+        char currentChar = array[i];
+        if (currentChar == '/') {
+            if (i + 1 < array.length && array[i + 1] == '/') {
+                insideComment = true;
+            } else if (i + 1 < array.length && array[i + 1] == '*') {
+                insideComment = true;
+                i++;
+            }
+        } else if (currentChar == '\n') {
+            insideComment = false;
+        } else if (currentChar == '*' && i + 1 < array.length && array[i + 1] == '/') {
+            insideComment = false;
+            i++;
+        } else if (currentChar == '"') {
+            insideString = !insideString;
+        } else if (!insideComment && !insideString) {
+            if (currentChar == '=' || currentChar == '+' || currentChar == '-' || currentChar == '<' || currentChar == '>' || currentChar == '*' || currentChar == '/' || currentChar == '%') {
+                data.push(currentChar);
+                sum++;
+            } else if (currentChar == 'r' && i + 6 < array.length && str.substring(i, i + 6).equals("return") && !Character.isLetter(array[i + 6])) {
+                sum++;
+            }
         }
-        return sum;
+    }
+    return sum;
+
+
     }
 
     /**
